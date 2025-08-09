@@ -76,12 +76,28 @@
     cursor: not-allowed;
   }
   #cart-section {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     background-color: #222;
     border: 2px solid #b22222;
-    padding: 1rem;
-    margin-top: 2rem;
+    padding: 1.5rem;
     border-radius: 8px;
     color: #ddd;
+    width: 90vw;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 0 15px #b22222cc;
+    z-index: 9999;
+  }
+  #cart-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 9998;
+    display: none; /* hidden by default */
   }
   .cart-item {
     display: flex; justify-content: space-between; margin-bottom: 0.5rem;
@@ -211,16 +227,19 @@
     </div>
   </section>
 
-  <section id="cart-section" class="hidden">
-    <h3>Your Cart</h3>
+  <section id="cart-section" class="hidden" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+    <h3 id="cart-title">Your Cart</h3>
     <div id="cart-items"></div>
     <p><strong>Total: $<span id="cart-total">0.00</span></strong></p>
-    <input type="text" id="promo-code-input" placeholder="Enter promo code" />
+    <input type="text" id="promo-code-input" placeholder="Enter promo code" aria-label="Promo code" />
     <button id="apply-promo-btn">Apply</button>
-    <p id="promo-message"></p>
+    <p id="promo-message" aria-live="polite"></p>
     <button id="checkout-btn" disabled>Pay with PayPal</button>
     <button id="close-cart-btn">Close Cart</button>
   </section>
+
+  <!-- Overlay background -->
+  <div id="cart-overlay" tabindex="-1" aria-hidden="true"></div>
 </main>
 
 <footer>
@@ -287,6 +306,7 @@
   const applyPromoBtn = document.getElementById("apply-promo-btn");
   const promoMessage = document.getElementById("promo-message");
   const closeCartBtn = document.getElementById("close-cart-btn");
+  const cartOverlay = document.getElementById("cart-overlay");
 
   let currentUser = null;
   let cart = [];
@@ -381,7 +401,7 @@
       div.className = "cart-item";
       div.innerHTML = `
         <span>${item.name} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}</span>
-        <button data-id="${item.id}">×</button>
+        <button data-id="${item.id}" aria-label="Remove ${item.name} from cart">×</button>
       `;
       cartItemsDiv.appendChild(div);
     });
@@ -411,6 +431,22 @@
       saveCart();
       renderCart();
     }
+  }
+
+  // Open cart modal & overlay
+  function openCart() {
+    renderCart();
+    cartSection.classList.remove("hidden");
+    cartOverlay.style.display = "block";
+    cartSection.focus();
+    cartOverlay.setAttribute("aria-hidden", "false");
+  }
+
+  // Close cart modal & overlay
+  function closeCart() {
+    cartSection.classList.add("hidden");
+    cartOverlay.style.display = "none";
+    cartOverlay.setAttribute("aria-hidden", "true");
   }
 
   // Handle auth state changes
@@ -459,39 +495,38 @@
     signOut(auth);
   });
 
-  // Product add to cart
+  // Add to cart buttons on products
   productsList.addEventListener("click", e => {
     if (e.target.tagName === "BUTTON") {
-      const id = parseInt(e.target.dataset.id);
+      const id = Number(e.target.getAttribute("data-id"));
       addToCart(id);
     }
   });
 
-  // Cart remove item
+  // Remove items from cart
   cartItemsDiv.addEventListener("click", e => {
     if (e.target.tagName === "BUTTON") {
-      const id = parseInt(e.target.dataset.id);
+      const id = Number(e.target.getAttribute("data-id"));
       removeFromCart(id);
-      renderCart();
     }
   });
 
-  // Open cart on nav click
+  // Cart link click opens modal
   cartLink.addEventListener("click", e => {
     e.preventDefault();
-    renderCart();
-    cartSection.classList.remove("hidden");
+    openCart();
   });
 
   // Close cart button
-  closeCartBtn.addEventListener("click", () => {
-    cartSection.classList.add("hidden");
-  });
+  closeCartBtn.addEventListener("click", closeCart);
+
+  // Clicking outside the cart closes it
+  cartOverlay.addEventListener("click", closeCart);
 
   // Promo codes and discounts
   const promos = {
     rock10: 0.10,
-    AMP20: 0.20,
+    amp20: 0.20,
     guitar5: 0.05
   };
 
@@ -508,7 +543,7 @@
     }
   });
 
-  // Checkout button opens PayPal with amount after discount
+  // Checkout button opens PayPal with discounted amount
   checkoutBtn.addEventListener("click", () => {
     if (cart.length === 0) return;
     const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -518,9 +553,10 @@
     window.open(paypalURL, "_blank");
   });
 
-  // Initialize page
+  // Initial setup
   renderProducts();
   loadCart();
+
 </script>
 
 </body>
