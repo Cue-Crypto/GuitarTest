@@ -1,84 +1,24 @@
-<svg width="320" height="140" viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Wicked Ass Auditory Logo">
-  <title>Wicked Ass Auditory Logo</title>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Wicked Ass Auditory Icon">
+  <title>Wicked Ass Auditory Icon</title>
 
-  <!-- Guitar body main shape -->
-  <path
-    d="M50 100 
-       C20 85 20 115 50 125 
-       C80 140 120 110 110 80 
-       C105 65 75 60 50 100 Z"
-    fill="#b22222" stroke="#5a0000" stroke-width="2" />
-  <!-- Guitar body shading -->
-  <ellipse cx="70" cy="105" rx="18" ry="12" fill="#8b0000" opacity="0.5" />
-  <!-- Sound hole -->
-  <circle cx="65" cy="105" r="8" fill="#5a0000" />
+  <!-- Guitar headstock -->
+  <rect x="10" y="20" width="12" height="60" fill="#b22222" rx="3" />
+  <circle cx="16" cy="25" r="3" fill="#8b0000" />
+  <circle cx="16" cy="40" r="3" fill="#8b0000" />
+  <circle cx="16" cy="55" r="3" fill="#8b0000" />
 
-  <!-- Guitar bridge -->
-  <rect x="65" y="120" width="25" height="6" fill="#5a0000" rx="3" />
+  <!-- Microphone capsule -->
+  <ellipse cx="60" cy="40" rx="12" ry="20" fill="#b22222" />
+  <line x1="60" y1="20" x2="60" y2="60" stroke="#8b0000" stroke-width="3" />
+  <line x1="48" y1="35" x2="72" y2="35" stroke="#8b0000" stroke-width="2" />
+  <line x1="48" y1="45" x2="72" y2="45" stroke="#8b0000" stroke-width="2" />
+  <line x1="48" y1="55" x2="72" y2="55" stroke="#8b0000" stroke-width="2" />
 
-  <!-- Neck -->
-  <rect x="110" y="40" width="18" height="70" fill="#8b0000" rx="5" />
-  <!-- Frets -->
-  <line x1="110" y1="50" x2="128" y2="50" stroke="#b22222" stroke-width="1.5" />
-  <line x1="110" y1="60" x2="128" y2="60" stroke="#b22222" stroke-width="1.5" />
-  <line x1="110" y1="70" x2="128" y2="70" stroke="#b22222" stroke-width="1.5" />
-  <line x1="110" y1="80" x2="128" y2="80" stroke="#b22222" stroke-width="1.5" />
-  <line x1="110" y1="90" x2="128" y2="90" stroke="#b22222" stroke-width="1.5" />
-  <line x1="110" y1="100" x2="128" y2="100" stroke="#b22222" stroke-width="1.5" />
+  <!-- Amplifier speaker -->
+  <rect x="78" y="25" width="15" height="40" fill="#b22222" rx="5" />
+  <rect x="81" y="30" width="9" height="30" fill="#8b0000" rx="3" />
 
-  <!-- Strings -->
-  <line x1="115" y1="40" x2="115" y2="110" stroke="#d3d3d3" stroke-width="1" />
-  <line x1="118" y1="40" x2="118" y2="110" stroke="#d3d3d3" stroke-width="0.8" />
-  <line x1="121" y1="40" x2="121" y2="110" stroke="#d3d3d3" stroke-width="0.7" />
-  <line x1="124" y1="40" x2="124" y2="110" stroke="#d3d3d3" stroke-width="0.6" />
-  <line x1="127" y1="40" x2="127" y2="110" stroke="#d3d3d3" stroke-width="0.5" />
-
-  <!-- Headstock -->
-  <path
-    d="M128 40
-       L150 35
-       L155 50
-       L130 55
-       Z"
-    fill="#8b0000" stroke="#5a0000" stroke-width="2" />
-  <!-- Tuning pegs -->
-  <circle cx="140" cy="40" r="3" fill="#b22222" />
-  <circle cx="145" cy="42" r="3" fill="#b22222" />
-  <circle cx="150" cy="44" r="3" fill="#b22222" />
-
-  <!-- Amplifier -->
-  <rect x="180" y="55" width="75" height="60" fill="#b22222" stroke="#5a0000" stroke-width="3" rx="15" />
-  <!-- Speaker grill -->
-  <rect x="195" y="70" width="45" height="40" fill="#8b0000" rx="10" />
-  <!-- Grill texture -->
-  <g stroke="#b22222" stroke-width="1.2">
-    <line x1="195" y1="80" x2="240" y2="80" />
-    <line x1="195" y1="85" x2="240" y2="85" />
-    <line x1="195" y1="90" x2="240" y2="90" />
-    <line x1="195" y1="95" x2="240" y2="95" />
-    <line x1="195" y1="100" x2="240" y2="100" />
-    <line x1="195" y1="105" x2="240" y2="105" />
-  </g>
-  <!-- Knobs -->
-  <circle cx="200" cy="65" r="6" fill="#8b0000" />
-  <circle cx="220" cy="65" r="6" fill="#8b0000" />
-  <circle cx="240" cy="65" r="6" fill="#8b0000" />
-
-  <!-- Microphone body -->
-  <rect x="270" y="50" width="18" height="45" fill="#b22222" stroke="#5a0000" stroke-width="2" rx="6" />
-  <!-- Microphone head -->
-  <ellipse cx="279" cy="45" rx="14" ry="12" fill="#8b0000" stroke="#5a0000" stroke-width="2" />
-  <!-- Mic grille -->
-  <g stroke="#b22222" stroke-width="2" >
-    <line x1="260" y1="40" x2="295" y2="55" />
-    <line x1="260" y1="45" x2="295" y2="60" />
-    <line x1="260" y1="50" x2="295" y2="65" />
-  </g>
-
-  <!-- Cord guitar to amp -->
-  <path d="M130 110 C165 135 195 130 180 115" stroke="#8b0000" stroke-width="5" fill="none" />
-  <!-- Cord amp to mic -->
-  <path d="M255 95 C265 120 270 110 270 95" stroke="#8b0000" stroke-width="5" fill="none" />
-  <line x1="255" y1="95" x2="270" y2="95" stroke="#8b0000" stroke-width="5" />
+  <!-- Amp cord -->
+  <path d="M22 80 Q40 90 78 70" stroke="#8b0000" stroke-width="3" fill="none" />
 
 </svg>
