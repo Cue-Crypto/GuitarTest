@@ -117,6 +117,40 @@
   #auth-status span {
     user-select: none;
   }
+  #promo-code-input {
+    margin-right: 8px;
+    padding: 0.4rem;
+    border-radius: 4px;
+    border: none;
+    width: 140px;
+  }
+  #apply-promo-btn {
+    background-color: #b22222;
+    color: #121212;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  #apply-promo-btn:hover {
+    background-color: #7f0000;
+  }
+  #promo-message {
+    color: #b22222;
+    margin-top: 0.5rem;
+  }
+  #close-cart-btn {
+    margin-top: 1rem;
+    background: #555;
+    color: #ddd;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .hidden {
+    display: none;
+  }
 </style>
 <link rel="icon" href="favicon.ico" />
 </head>
@@ -132,9 +166,7 @@
     <a href="#shop" id="shop-link">Shop</a>
     <a href="#cart" id="cart-link">Cart (<span id="cart-count">0</span>)</a>
   </nav>
-  <div id="auth-status">
-    <!-- Filled by JS -->
-  </div>
+  <div id="auth-status"></div>
 </header>
 
 <main>
@@ -154,7 +186,7 @@
       <input type="password" id="password" placeholder="Password" required />
       <button id="login-btn">Login</button>
       <button id="signup-btn">Sign Up</button>
-      <p id="auth-message" style="color:#b22222;"></p>
+      <p id="auth-message"></p>
     </div>
   </section>
 
@@ -169,7 +201,11 @@
     <h3>Your Cart</h3>
     <div id="cart-items"></div>
     <p><strong>Total: $<span id="cart-total">0.00</span></strong></p>
+    <input type="text" id="promo-code-input" placeholder="Enter promo code" />
+    <button id="apply-promo-btn">Apply</button>
+    <p id="promo-message"></p>
     <button id="checkout-btn" disabled>Pay with PayPal</button>
+    <button id="close-cart-btn">Close Cart</button>
   </section>
 </main>
 
@@ -184,22 +220,20 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-  // TODO: Replace with your Firebase config from your Firebase project settings
-const firebaseConfig = {
-  apiKey: "AIzaSyDb5U0bC3q1zh0vwnElcF-ao7UJz9qkFhQ",
-  authDomain: "wickedassguitar.firebaseapp.com",
-  projectId: "wickedassguitar",
-  storageBucket: "wickedassguitar.appspot.com",
-  messagingSenderId: "1032631519314",
-  appId: "1:1032631519314:web:YOUR_APP_ID_HERE"
-};
+  // Your Firebase config - replace YOUR_APP_ID with your actual app ID
+  const firebaseConfig = {
+    apiKey: "AIzaSyDb5U0bC3q1zh0vwnElcF-ao7UJz9qkFhQ",
+    authDomain: "wickedassguitar.firebaseapp.com",
+    projectId: "wickedassguitar",
+    storageBucket: "wickedassguitar.appspot.com",
+    messagingSenderId: "1032631519314",
+    appId: "1:1032631519314:web:YOUR_APP_ID"
+  };
 
-  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // Products data
   const products = [
     {id: 1, name: "Electric Guitar", price: 799, image: "images/guitar1.jpg"},
     {id: 2, name: "Guitar Amplifier", price: 299, image: "images/amp1.jpg"},
@@ -211,6 +245,7 @@ const firebaseConfig = {
     {id: 8, name: "Amp Headphone", price: 89, image: "images/headphone1.jpg"}
   ];
 
+  // DOM elements
   const productsList = document.getElementById("products-list");
   const cartSection = document.getElementById("cart-section");
   const cartItemsDiv = document.getElementById("cart-items");
@@ -229,8 +264,15 @@ const firebaseConfig = {
   const signupBtn = document.getElementById("signup-btn");
   const authMessageP = document.getElementById("auth-message");
 
+  const cartLink = document.getElementById("cart-link");
+  const promoCodeInput = document.getElementById("promo-code-input");
+  const applyPromoBtn = document.getElementById("apply-promo-btn");
+  const promoMessage = document.getElementById("promo-message");
+  const closeCartBtn = document.getElementById("close-cart-btn");
+
   let currentUser = null;
   let cart = [];
+  let appliedDiscount = 0;
 
   // Render products
   function renderProducts() {
@@ -289,13 +331,15 @@ const firebaseConfig = {
     cartCountSpan.textContent = totalCount;
   }
 
-  // Render cart items in cart section
+  // Render cart items
   function renderCart() {
     cartItemsDiv.innerHTML = "";
     if (cart.length === 0) {
       cartItemsDiv.textContent = "Your cart is empty.";
       checkoutBtn.disabled = true;
       cartTotalSpan.textContent = "0.00";
+      promoMessage.textContent = "";
+      appliedDiscount = 0;
       return;
     }
     checkoutBtn.disabled = false;
@@ -310,7 +354,8 @@ const firebaseConfig = {
       `;
       cartItemsDiv.appendChild(div);
     });
-    cartTotalSpan.textContent = total.toFixed(2);
+    let discountedTotal = total * (1 - appliedDiscount);
+    cartTotalSpan.textContent = discountedTotal.toFixed(2);
   }
 
   // Add product to cart
@@ -337,7 +382,7 @@ const firebaseConfig = {
     }
   }
 
-  // Handle login
+  // Auth handlers
   loginBtn.addEventListener("click", async () => {
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
@@ -353,7 +398,6 @@ const firebaseConfig = {
     }
   });
 
-  // Handle signup
   signupBtn.addEventListener("click", async () => {
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
@@ -369,12 +413,10 @@ const firebaseConfig = {
     }
   });
 
-  // Handle logout
   logoutBtn.addEventListener("click", () => {
     auth.signOut();
   });
 
-  // Listen for auth state changes
   auth.onAuthStateChanged(async user => {
     currentUser = user;
     if (user) {
@@ -390,10 +432,12 @@ const firebaseConfig = {
       updateCartCount();
       cartItemsDiv.textContent = "";
       cartTotalSpan.textContent = "0.00";
+      promoMessage.textContent = "";
+      appliedDiscount = 0;
     }
   });
 
-  // Event delegation for product buttons
+  // Product Add to Cart event
   productsList.addEventListener("click", e => {
     if (e.target.tagName === "BUTTON") {
       const id = parseInt(e.target.dataset.id);
@@ -401,7 +445,7 @@ const firebaseConfig = {
     }
   });
 
-  // Event delegation for cart remove buttons
+  // Cart remove buttons event
   cartItemsDiv.addEventListener("click", e => {
     if (e.target.tagName === "BUTTON") {
       const id = parseInt(e.target.dataset.id);
@@ -409,17 +453,56 @@ const firebaseConfig = {
     }
   });
 
-  // Checkout with PayPal
+  // Open cart when clicking nav cart link
+  cartLink.addEventListener("click", e => {
+    e.preventDefault();
+    renderCart();
+    cartSection.classList.remove("hidden");
+  });
+
+  // Close cart button
+  closeCartBtn.addEventListener("click", () => {
+    cartSection.classList.add("hidden");
+  });
+
+  // Promo code application
+  applyPromoBtn.addEventListener("click", () => {
+    const code = promoCodeInput.value.trim().toUpperCase();
+    if (!code) {
+      promoMessage.textContent = "Please enter a promo code.";
+      return;
+    }
+
+    // Promo codes: key = code, value = discount decimal
+    const promos = {
+      "ROCK10": 0.10,   // 10% off
+      "AMP20": 0.20,    // 20% off
+      "GUITAR5": 0.05   // 5% off
+    };
+
+    if (promos[code]) {
+      appliedDiscount = promos[code];
+      promoMessage.textContent = `Promo code applied! You saved ${(appliedDiscount * 100).toFixed(0)}%.`;
+      renderCart();
+    } else {
+      promoMessage.textContent = "Invalid promo code.";
+      appliedDiscount = 0;
+      renderCart();
+    }
+  });
+
+  // Checkout button opens PayPal with amount after discount
   checkoutBtn.addEventListener("click", () => {
     if (cart.length === 0) return;
-    const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2);
-    const paypalURL = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=YOUR_PAYPAL_EMAIL&currency_code=USD&amount=${total}&item_name=Music Gear Purchase`;
+    const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const discountedTotal = total * (1 - appliedDiscount);
+    const paypalEmail = "YOUR_PAYPAL_EMAIL"; // Replace this!
+    const paypalURL = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${encodeURIComponent(paypalEmail)}&currency_code=USD&amount=${discountedTotal.toFixed(2)}&item_name=Music Gear Purchase`;
     window.open(paypalURL, "_blank");
   });
 
-  // Initial rendering
+  // Initial render
   renderProducts();
-
 </script>
 
 </body>
