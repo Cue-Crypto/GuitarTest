@@ -4,53 +4,172 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Wicked Ass Guitars - Gear And Hear</title>
-<link rel="stylesheet" href="styles.css" />
+<style>
+  /* Dark red/black theme */
+  body {
+    margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212; color: #ddd;
+    display: flex; flex-direction: column; min-height: 100vh;
+  }
+  header {
+    background-color: #1c1c1c;
+    border-bottom: 2px solid #b22222;
+    padding: 1rem 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .logo img {
+    width: 48px; height: 48px;
+  }
+  .logo h1 {
+    color: #b22222; font-size: 1.5rem; user-select: none;
+  }
+  nav a, #auth-status span {
+    color: #ddd; margin-left: 1rem; text-decoration: none;
+    font-weight: 600; cursor: pointer;
+    user-select: none;
+  }
+  nav a.active, nav a:hover {
+    color: #b22222;
+  }
+  main {
+    flex: 1; padding: 1rem 2rem;
+    max-width: 960px; margin: 0 auto;
+  }
+  h2 {
+    color: #b22222;
+    margin-bottom: 1rem;
+  }
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+    gap: 1.5rem;
+  }
+  .product-card {
+    background-color: #222;
+    border: 1px solid #b22222;
+    border-radius: 6px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .product-card img {
+    max-width: 100%;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  .product-card h4 {
+    margin-bottom: 0.5rem;
+  }
+  button {
+    background-color: #b22222;
+    color: #121212;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+  }
+  #cart-section {
+    background-color: #222;
+    border: 2px solid #b22222;
+    padding: 1rem;
+    margin-top: 2rem;
+    border-radius: 8px;
+    color: #ddd;
+  }
+  .cart-item {
+    display: flex; justify-content: space-between; margin-bottom: 0.5rem;
+  }
+  .cart-item button {
+    background-color: #7f0000;
+    padding: 0 6px;
+    font-weight: 900;
+  }
+  #auth-section {
+    margin: 1rem 0 2rem;
+    background-color: #222;
+    padding: 1rem;
+    border-radius: 6px;
+    max-width: 400px;
+  }
+  #auth-section input {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: none;
+  }
+  #auth-section button {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  #auth-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  #auth-status span {
+    user-select: none;
+  }
+</style>
 <link rel="icon" href="favicon.ico" />
-<meta name="description" content="Wicked Ass Guitars - Selling guitars, amps, mics, pickups and more." />
 </head>
 <body>
+
 <header>
   <div class="logo">
     <img src="logo.svg" alt="Wicked Ass Guitars logo" />
     <h1>Wicked Ass Guitars</h1>
   </div>
   <nav>
-    <a href="index.html" class="active">Home</a>
-    <a href="shop.html">Shop</a>
-    <a href="about.html">About</a>
-    <a href="contact.html">Contact</a>
-    <a href="faq.html">FAQ</a>
+    <a href="#" class="active">Home</a>
+    <a href="#shop" id="shop-link">Shop</a>
+    <a href="#cart" id="cart-link">Cart (<span id="cart-count">0</span>)</a>
   </nav>
+  <div id="auth-status">
+    <!-- Filled by JS -->
+  </div>
 </header>
 
 <main>
   <section class="hero">
-    <h2>Gear And Hear.</h2>
+    <h2>Gear And Hear</h2>
     <p>Find the best guitars, amps, mics, pickups, and accessories here.</p>
   </section>
 
-  <section class="featured-products">
-    <h3>Featured Products</h3>
-    <div class="products-grid">
-      <div class="product-card">
-        <img src="images/guitar1.jpg" alt="Electric Guitar" />
-        <h4>Electric Guitar</h4>
-        <p>$799.00</p>
-        <a href="shop.html#electric-guitar" class="buy-btn">Buy with PayPal</a>
-      </div>
-      <div class="product-card">
-        <img src="images/amp1.jpg" alt="Guitar Amplifier" />
-        <h4>Guitar Amplifier</h4>
-        <p>$299.00</p>
-        <a href="shop.html#guitar-amp" class="buy-btn">Buy with PayPal</a>
-      </div>
-      <div class="product-card">
-        <img src="images/mic1.jpg" alt="Dynamic Microphone" />
-        <h4>Dynamic Microphone</h4>
-        <p>$149.00</p>
-        <a href="shop.html#dynamic-mic" class="buy-btn">Buy with PayPal</a>
-      </div>
+  <section id="auth-section">
+    <h3>User Account</h3>
+    <div id="user-info" style="display:none;">
+      Logged in as <strong id="user-email"></strong>
+      <button id="logout-btn">Logout</button>
     </div>
+    <div id="login-form">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button id="login-btn">Login</button>
+      <button id="signup-btn">Sign Up</button>
+      <p id="auth-message" style="color:#b22222;"></p>
+    </div>
+  </section>
+
+  <section id="shop" class="featured-products">
+    <h3>Featured Products</h3>
+    <div class="products-grid" id="products-list">
+      <!-- Products loaded by JS -->
+    </div>
+  </section>
+
+  <section id="cart-section" class="hidden">
+    <h3>Your Cart</h3>
+    <div id="cart-items"></div>
+    <p><strong>Total: $<span id="cart-total">0.00</span></strong></p>
+    <button id="checkout-btn" disabled>Pay with PayPal</button>
   </section>
 </main>
 
@@ -58,6 +177,250 @@
   <p>&copy; 2025 Wicked Ass Guitars. All rights reserved.</p>
   <p>Contact us: <a href="mailto:contact@wickedassguitars.com">contact@wickedassguitars.com</a></p>
 </footer>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  // TODO: Replace with your Firebase config from your Firebase project settings
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_MSG_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // Products data
+  const products = [
+    {id: 1, name: "Electric Guitar", price: 799, image: "images/guitar1.jpg"},
+    {id: 2, name: "Guitar Amplifier", price: 299, image: "images/amp1.jpg"},
+    {id: 3, name: "Dynamic Microphone", price: 149, image: "images/mic1.jpg"},
+    {id: 4, name: "Pickup Set", price: 99, image: "images/pickup1.jpg"},
+    {id: 5, name: "Microphone Stand", price: 49, image: "images/micstand1.jpg"},
+    {id: 6, name: "Guitar Cable", price: 19, image: "images/cable1.jpg"},
+    {id: 7, name: "Condenser Microphone", price: 249, image: "images/mic2.jpg"},
+    {id: 8, name: "Amp Headphone", price: 89, image: "images/headphone1.jpg"}
+  ];
+
+  const productsList = document.getElementById("products-list");
+  const cartSection = document.getElementById("cart-section");
+  const cartItemsDiv = document.getElementById("cart-items");
+  const cartTotalSpan = document.getElementById("cart-total");
+  const checkoutBtn = document.getElementById("checkout-btn");
+  const cartCountSpan = document.getElementById("cart-count");
+  const authStatusDiv = document.getElementById("auth-status");
+
+  const userInfoDiv = document.getElementById("user-info");
+  const userEmailSpan = document.getElementById("user-email");
+  const logoutBtn = document.getElementById("logout-btn");
+  const loginFormDiv = document.getElementById("login-form");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const loginBtn = document.getElementById("login-btn");
+  const signupBtn = document.getElementById("signup-btn");
+  const authMessageP = document.getElementById("auth-message");
+
+  let currentUser = null;
+  let cart = [];
+
+  // Render products
+  function renderProducts() {
+    productsList.innerHTML = "";
+    products.forEach(product => {
+      const div = document.createElement("div");
+      div.className = "product-card";
+      div.innerHTML = `
+        <img src="${product.image}" alt="${product.name}" />
+        <h4>${product.name}</h4>
+        <p>$${product.price.toFixed(2)}</p>
+        <button data-id="${product.id}">Add to Cart</button>
+      `;
+      productsList.appendChild(div);
+    });
+  }
+
+  // Load cart from Firestore or localStorage
+  async function loadCart() {
+    if (currentUser) {
+      try {
+        const doc = await db.collection("carts").doc(currentUser.uid).get();
+        if (doc.exists) {
+          cart = doc.data().items || [];
+        } else {
+          cart = [];
+        }
+      } catch (error) {
+        console.error("Error loading cart:", error);
+        cart = [];
+      }
+    } else {
+      const storedCart = localStorage.getItem("cart");
+      cart = storedCart ? JSON.parse(storedCart) : [];
+    }
+    updateCartCount();
+  }
+
+  // Save cart to Firestore or localStorage
+  async function saveCart() {
+    if (currentUser) {
+      try {
+        await db.collection("carts").doc(currentUser.uid).set({items: cart});
+      } catch (error) {
+        console.error("Error saving cart:", error);
+      }
+    } else {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+    updateCartCount();
+  }
+
+  // Update cart count display
+  function updateCartCount() {
+    const totalCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+    cartCountSpan.textContent = totalCount;
+  }
+
+  // Render cart items in cart section
+  function renderCart() {
+    cartItemsDiv.innerHTML = "";
+    if (cart.length === 0) {
+      cartItemsDiv.textContent = "Your cart is empty.";
+      checkoutBtn.disabled = true;
+      cartTotalSpan.textContent = "0.00";
+      return;
+    }
+    checkoutBtn.disabled = false;
+    let total = 0;
+    cart.forEach(item => {
+      total += item.price * item.quantity;
+      const div = document.createElement("div");
+      div.className = "cart-item";
+      div.innerHTML = `
+        <span>${item.name} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}</span>
+        <button data-id="${item.id}">×</button>
+      `;
+      cartItemsDiv.appendChild(div);
+    });
+    cartTotalSpan.textContent = total.toFixed(2);
+  }
+
+  // Add product to cart
+  function addToCart(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    const cartItem = cart.find(item => item.id === productId);
+    if (cartItem) {
+      cartItem.quantity++;
+    } else {
+      cart.push({id: product.id, name: product.name, price: product.price, quantity: 1});
+    }
+    saveCart();
+    alert(`${product.name} added to cart!`);
+  }
+
+  // Remove item from cart
+  function removeFromCart(productId) {
+    const index = cart.findIndex(item => item.id === productId);
+    if (index > -1) {
+      cart.splice(index, 1);
+      saveCart();
+      renderCart();
+    }
+  }
+
+  // Handle login
+  loginBtn.addEventListener("click", async () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    if (!email || !password) {
+      authMessageP.textContent = "Please enter email and password.";
+      return;
+    }
+    authMessageP.textContent = "";
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+    } catch (err) {
+      authMessageP.textContent = err.message;
+    }
+  });
+
+  // Handle signup
+  signupBtn.addEventListener("click", async () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    if (!email || !password) {
+      authMessageP.textContent = "Please enter email and password.";
+      return;
+    }
+    authMessageP.textContent = "";
+    try {
+      await auth.createUserWithEmailAndPassword(email, password);
+    } catch (err) {
+      authMessageP.textContent = err.message;
+    }
+  });
+
+  // Handle logout
+  logoutBtn.addEventListener("click", () => {
+    auth.signOut();
+  });
+
+  // Listen for auth state changes
+  auth.onAuthStateChanged(async user => {
+    currentUser = user;
+    if (user) {
+      userInfoDiv.style.display = "block";
+      loginFormDiv.style.display = "none";
+      userEmailSpan.textContent = user.email;
+      await loadCart();
+      renderCart();
+    } else {
+      userInfoDiv.style.display = "none";
+      loginFormDiv.style.display = "block";
+      cart = [];
+      updateCartCount();
+      cartItemsDiv.textContent = "";
+      cartTotalSpan.textContent = "0.00";
+    }
+  });
+
+  // Event delegation for product buttons
+  productsList.addEventListener("click", e => {
+    if (e.target.tagName === "BUTTON") {
+      const id = parseInt(e.target.dataset.id);
+      addToCart(id);
+    }
+  });
+
+  // Event delegation for cart remove buttons
+  cartItemsDiv.addEventListener("click", e => {
+    if (e.target.tagName === "BUTTON") {
+      const id = parseInt(e.target.dataset.id);
+      removeFromCart(id);
+    }
+  });
+
+  // Checkout with PayPal
+  checkoutBtn.addEventListener("click", () => {
+    if (cart.length === 0) return;
+    const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2);
+    const paypalURL = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=YOUR_PAYPAL_EMAIL&currency_code=USD&amount=${total}&item_name=Music Gear Purchase`;
+    window.open(paypalURL, "_blank");
+  });
+
+  // Initial rendering
+  renderProducts();
+
+</script>
 
 </body>
 </html>
