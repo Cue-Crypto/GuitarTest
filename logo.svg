@@ -1,14 +1,30 @@
-<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Wicked Ass Guitars logo">
-  <title>Wicked Ass Guitars Logo</title>
-  <!-- Guitar neck -->
-  <rect x="10" y="20" width="10" height="60" fill="#b22222" rx="3" />
+<svg width="180" height="100" viewBox="0 0 180 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Wicked Ass Auditory Logo">
+  <title>Wicked Ass Auditory Logo</title>
+  
   <!-- Guitar body -->
-  <ellipse cx="25" cy="60" rx="20" ry="15" fill="#8b0000" />
-  <!-- Amplifier -->
-  <rect x="55" y="30" width="30" height="40" fill="#b22222" rx="5" />
-  <rect x="60" y="40" width="20" height="20" fill="#8b0000" />
-  <!-- Comedic butt silhouette -->
-  <ellipse cx="70" cy="80" rx="12" ry="10" fill="#b22222" />
-  <circle cx="65" cy="75" r="5" fill="#8b0000" />
-  <circle cx="75" cy="75" r="5" fill="#8b0000" />
+  <ellipse cx="40" cy="60" rx="25" ry="18" fill="#b22222" />
+  <!-- Guitar neck -->
+  <rect x="50" y="20" width="12" height="50" fill="#8b0000" rx="3" />
+  <!-- Guitar head -->
+  <rect x="58" y="12" width="8" height="12" fill="#8b0000" rx="2" />
+  
+  <!-- Amplifier box -->
+  <rect x="90" y="30" width="50" height="40" fill="#b22222" rx="8" />
+  <!-- Amplifier speaker grid -->
+  <rect x="100" y="40" width="30" height="25" fill="#8b0000" rx="4" />
+  <line x1="100" y1="50" x2="130" y2="50" stroke="#b22222" stroke-width="2" />
+  <line x1="100" y1="55" x2="130" y2="55" stroke="#b22222" stroke-width="2" />
+  <line x1="100" y1="60" x2="130" y2="60" stroke="#b22222" stroke-width="2" />
+  
+  <!-- Microphone handle -->
+  <rect x="155" y="30" width="12" height="35" fill="#b22222" rx="3" />
+  <!-- Microphone head -->
+  <circle cx="161" cy="25" r="10" fill="#8b0000" />
+  <line x1="161" y1="15" x2="161" y2="35" stroke="#b22222" stroke-width="2" />
+  
+  <!-- Cord from guitar to amp -->
+  <path d="M65 70 Q75 80 90 70" stroke="#8b0000" stroke-width="3" fill="none" />
+  <!-- Cord from amp to mic -->
+  <path d="M140 55 Q150 65 155 55" stroke="#8b0000" stroke-width="3" fill="none" />
+  
 </svg>
