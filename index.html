@@ -151,6 +151,20 @@
   .hidden {
     display: none;
   }
+  footer {
+    background: #1c1c1c;
+    color: #bbb;
+    text-align: center;
+    padding: 1rem;
+    margin-top: auto;
+  }
+  footer a {
+    color: #b22222;
+    text-decoration: none;
+  }
+  footer a:hover {
+    text-decoration: underline;
+  }
 </style>
 <link rel="icon" href="favicon.ico" />
 </head>
@@ -162,7 +176,7 @@
     <h1>Wicked Ass Guitars</h1>
   </div>
   <nav>
-    <a href="#" class="active">Home</a>
+    <a href="#" class="active" id="home-link">Home</a>
     <a href="#shop" id="shop-link">Shop</a>
     <a href="#cart" id="cart-link">Cart (<span id="cart-count">0</span>)</a>
   </nav>
@@ -214,36 +228,41 @@
   <p>Contact us: <a href="mailto:contact@wickedassguitars.com">contact@wickedassguitars.com</a></p>
 </footer>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
 
-<script>
-  // Your Firebase config - replace YOUR_APP_ID with your actual app ID
+  import {
+    getAuth,
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc
+  } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyDb5U0bC3q1zh0vwnElcF-ao7UJz9qkFhQ",
     authDomain: "wickedassguitar.firebaseapp.com",
     projectId: "wickedassguitar",
-    storageBucket: "wickedassguitar.appspot.com",
+    storageBucket: "wickedassguitar.firebasestorage.app",
     messagingSenderId: "1032631519314",
-    appId: "1:1032631519314:web:YOUR_APP_ID"
+    appId: "1:1032631519314:web:545800dddb9be845ad378b",
+    measurementId: "G-752ZH1X1BR"
   };
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  const products = [
-    {id: 1, name: "Electric Guitar", price: 799, image: "images/guitar1.jpg"},
-    {id: 2, name: "Guitar Amplifier", price: 299, image: "images/amp1.jpg"},
-    {id: 3, name: "Dynamic Microphone", price: 149, image: "images/mic1.jpg"},
-    {id: 4, name: "Pickup Set", price: 99, image: "images/pickup1.jpg"},
-    {id: 5, name: "Microphone Stand", price: 49, image: "images/micstand1.jpg"},
-    {id: 6, name: "Guitar Cable", price: 19, image: "images/cable1.jpg"},
-    {id: 7, name: "Condenser Microphone", price: 249, image: "images/mic2.jpg"},
-    {id: 8, name: "Amp Headphone", price: 89, image: "images/headphone1.jpg"}
-  ];
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
   // DOM elements
   const productsList = document.getElementById("products-list");
@@ -252,7 +271,6 @@
   const cartTotalSpan = document.getElementById("cart-total");
   const checkoutBtn = document.getElementById("checkout-btn");
   const cartCountSpan = document.getElementById("cart-count");
-  const authStatusDiv = document.getElementById("auth-status");
 
   const userInfoDiv = document.getElementById("user-info");
   const userEmailSpan = document.getElementById("user-email");
@@ -274,6 +292,18 @@
   let cart = [];
   let appliedDiscount = 0;
 
+  // Product data
+  const products = [
+    {id: 1, name: "Electric Guitar", price: 799, image: "images/guitar1.jpg"},
+    {id: 2, name: "Guitar Amplifier", price: 299, image: "images/amp1.jpg"},
+    {id: 3, name: "Dynamic Microphone", price: 149, image: "images/mic1.jpg"},
+    {id: 4, name: "Pickup Set", price: 99, image: "images/pickup1.jpg"},
+    {id: 5, name: "Microphone Stand", price: 49, image: "images/micstand1.jpg"},
+    {id: 6, name: "Guitar Cable", price: 19, image: "images/cable1.jpg"},
+    {id: 7, name: "Condenser Microphone", price: 249, image: "images/mic2.jpg"},
+    {id: 8, name: "Amp Headphone", price: 89, image: "images/headphone1.jpg"}
+  ];
+
   // Render products
   function renderProducts() {
     productsList.innerHTML = "";
@@ -294,9 +324,10 @@
   async function loadCart() {
     if (currentUser) {
       try {
-        const doc = await db.collection("carts").doc(currentUser.uid).get();
-        if (doc.exists) {
-          cart = doc.data().items || [];
+        const docRef = doc(db, "carts", currentUser.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          cart = docSnap.data().items || [];
         } else {
           cart = [];
         }
@@ -315,7 +346,7 @@
   async function saveCart() {
     if (currentUser) {
       try {
-        await db.collection("carts").doc(currentUser.uid).set({items: cart});
+        await setDoc(doc(db, "carts", currentUser.uid), {items: cart});
       } catch (error) {
         console.error("Error saving cart:", error);
       }
@@ -325,13 +356,13 @@
     updateCartCount();
   }
 
-  // Update cart count display
+  // Update cart count in nav
   function updateCartCount() {
     const totalCount = cart.reduce((acc, item) => acc + item.quantity, 0);
     cartCountSpan.textContent = totalCount;
   }
 
-  // Render cart items
+  // Render cart items and total
   function renderCart() {
     cartItemsDiv.innerHTML = "";
     if (cart.length === 0) {
@@ -382,42 +413,8 @@
     }
   }
 
-  // Auth handlers
-  loginBtn.addEventListener("click", async () => {
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-    if (!email || !password) {
-      authMessageP.textContent = "Please enter email and password.";
-      return;
-    }
-    authMessageP.textContent = "";
-    try {
-      await auth.signInWithEmailAndPassword(email, password);
-    } catch (err) {
-      authMessageP.textContent = err.message;
-    }
-  });
-
-  signupBtn.addEventListener("click", async () => {
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-    if (!email || !password) {
-      authMessageP.textContent = "Please enter email and password.";
-      return;
-    }
-    authMessageP.textContent = "";
-    try {
-      await auth.createUserWithEmailAndPassword(email, password);
-    } catch (err) {
-      authMessageP.textContent = err.message;
-    }
-  });
-
-  logoutBtn.addEventListener("click", () => {
-    auth.signOut();
-  });
-
-  auth.onAuthStateChanged(async user => {
+  // Handle auth state changes
+  onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     if (user) {
       userInfoDiv.style.display = "block";
@@ -437,7 +434,32 @@
     }
   });
 
-  // Product Add to Cart event
+  // Login button
+  loginBtn.addEventListener("click", async () => {
+    try {
+      await signInWithEmailAndPassword(auth, emailInput.value.trim(), passwordInput.value.trim());
+      authMessageP.textContent = "";
+    } catch (err) {
+      authMessageP.textContent = err.message;
+    }
+  });
+
+  // Sign up button
+  signupBtn.addEventListener("click", async () => {
+    try {
+      await createUserWithEmailAndPassword(auth, emailInput.value.trim(), passwordInput.value.trim());
+      authMessageP.textContent = "";
+    } catch (err) {
+      authMessageP.textContent = err.message;
+    }
+  });
+
+  // Logout button
+  logoutBtn.addEventListener("click", () => {
+    signOut(auth);
+  });
+
+  // Product add to cart
   productsList.addEventListener("click", e => {
     if (e.target.tagName === "BUTTON") {
       const id = parseInt(e.target.dataset.id);
@@ -445,15 +467,16 @@
     }
   });
 
-  // Cart remove buttons event
+  // Cart remove item
   cartItemsDiv.addEventListener("click", e => {
     if (e.target.tagName === "BUTTON") {
       const id = parseInt(e.target.dataset.id);
       removeFromCart(id);
+      renderCart();
     }
   });
 
-  // Open cart when clicking nav cart link
+  // Open cart on nav click
   cartLink.addEventListener("click", e => {
     e.preventDefault();
     renderCart();
@@ -465,21 +488,15 @@
     cartSection.classList.add("hidden");
   });
 
-  // Promo code application
+  // Promo codes and discounts
+  const promos = {
+    rock10: 0.10,
+    AMP20: 0.20,
+    guitar5: 0.05
+  };
+
   applyPromoBtn.addEventListener("click", () => {
-    const code = promoCodeInput.value.trim().toUpperCase();
-    if (!code) {
-      promoMessage.textContent = "Please enter a promo code.";
-      return;
-    }
-
-    // Promo codes: key = code, value = discount decimal
-    const promos = {
-      "ROCK10": 0.10,   // 10% off
-      "AMP20": 0.20,    // 20% off
-      "GUITAR5": 0.05   // 5% off
-    };
-
+    const code = promoCodeInput.value.trim().toLowerCase();
     if (promos[code]) {
       appliedDiscount = promos[code];
       promoMessage.textContent = `Promo code applied! You saved ${(appliedDiscount * 100).toFixed(0)}%.`;
@@ -496,13 +513,14 @@
     if (cart.length === 0) return;
     const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const discountedTotal = total * (1 - appliedDiscount);
-    const paypalEmail = "YOUR_PAYPAL_EMAIL"; // Replace this!
+    const paypalEmail = "YOUR_PAYPAL_EMAIL"; // <-- REPLACE THIS WITH YOUR PAYPAL EMAIL
     const paypalURL = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${encodeURIComponent(paypalEmail)}&currency_code=USD&amount=${discountedTotal.toFixed(2)}&item_name=Music Gear Purchase`;
     window.open(paypalURL, "_blank");
   });
 
-  // Initial render
+  // Initialize page
   renderProducts();
+  loadCart();
 </script>
 
 </body>
